@@ -8,6 +8,7 @@ namespace YamlToWz
 {
     internal class YamlQuest
     {
+        public string Path { get; set; }
         public int Id { get; set; }
         public string Name { get; set; }
         public string? Parent { get; set; }
@@ -52,6 +53,7 @@ namespace YamlToWz
     internal class QuestRewards
     {
         public int? Exp { get; set; }
+        public int? Money { get; set; }
         public List<Item>? Items { get; set; }
     }
 

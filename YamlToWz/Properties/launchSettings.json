@@ -2,7 +2,7 @@
   "profiles": {
     "YamlToWz": {
       "commandName": "Project",
-      "commandLineArgs": "D:\\MapleDev\\v95-roguelike\\data\\quests\\rr1_magician.yaml \"D:\\MapleDev\\Game\\_Clean\\Quest.wz\""
+      "commandLineArgs": "\"D:\\MapleDev\\Game\\Current Version\" \"D:\\MapleDev\\v95-roguelike\\data\\quests\" "
     }
   }
 }
