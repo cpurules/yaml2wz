@@ -2,7 +2,7 @@
   "profiles": {
     "YamlToWz": {
       "commandName": "Project",
-      "commandLineArgs": "\"D:\\MapleDev\\Game\\Current Version\" \"D:\\MapleDev\\v95-roguelike\\data\\quests\" "
+      "commandLineArgs": "\"D:\\MapleDev\\Game\\WIP\" \"D:\\MapleDev\\v95-roguelike\\data\\custom\\\\\" -r"
     }
   }
 }

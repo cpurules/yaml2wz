@@ -28,6 +28,8 @@ namespace YamlToWz
                     wzImageProperty.ParseImage();
                 if (child is WzImageProperty imgProperty)
                 {
+                    if (wzImageProperty.GetFromPath(imgProperty.Name) != null)
+                        wzImageProperty.RemoveProperty(wzImageProperty.GetFromPath(imgProperty.Name));
                     wzImageProperty.AddProperty(imgProperty);
                     wzImageProperty.Changed = true;
                 }
@@ -38,6 +40,8 @@ namespace YamlToWz
             {
                 if (child is WzImageProperty property)
                 {
+                    if (container.WzProperties.Any(x => x.Name.Equals(property.Name)))
+                        container.RemoveProperty(container.WzProperties.First(x => x.Name.Equals(property.Name)));
                     container.AddProperty(property);
                     if (parent is WzImageProperty imgProperty)
                         imgProperty.ParentImage.Changed = true;
