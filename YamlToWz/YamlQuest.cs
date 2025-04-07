@@ -110,6 +110,8 @@ namespace YamlToWz
                     {
                         var mob_i = new WzSubProperty(i.ToString());
                         mob.AddAndUpdate(mob_i);
+                        mob_i.AddAndUpdate(new WzIntProperty("id", Checks.Mobs[i].Id));
+                        mob_i.AddAndUpdate(new WzIntProperty("count", Checks.Mobs[i].Count));
                     }
                 }
             }
