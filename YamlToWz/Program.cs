@@ -24,6 +24,8 @@ namespace YamlToWz
         [YamlMember(Alias="perk", ApplyNamingConventions = false)]
         public List<YamlPerk> Perks { get; set; } = new();
         public List<YamlItem> Items { get; set; } = new();
+        [YamlMember(Alias="npc", ApplyNamingConventions = false)]
+        public List<YamlNpc> Npcs { get; set; } = new();
 
         public static YamlData FromFile(string path)
         {
@@ -40,7 +42,7 @@ namespace YamlToWz
 
         public HashSet<string> GetWzFileNames()
         {
-            return (YamlQuest.WZ_FILES.Union(YamlPerk.WZ_FILES).Union(YamlItem.WZ_FILES)).ToHashSet();
+            return (YamlQuest.WZ_FILES.Union(YamlPerk.WZ_FILES).Union(YamlItem.WZ_FILES).Union(YamlNpc.WZ_FILES)).ToHashSet();
         }
 
         public void SetPaths(string path)
@@ -48,6 +50,7 @@ namespace YamlToWz
             Quests.ForEach(x => x.Path = path);
             Perks.ForEach(x => x.Path = path);
             Items.ForEach(x => x.Path = path);
+            Npcs.ForEach(x => x.Path = path);
         }
 
         public void Merge(YamlData other)
@@ -55,6 +58,7 @@ namespace YamlToWz
             Quests.AddRange(other.Quests);
             Perks.AddRange(other.Perks);
             Items.AddRange(other.Items);
+            Npcs.AddRange(other.Npcs);
         }
     }
 
@@ -139,6 +143,11 @@ namespace YamlToWz
             {
                 Console.WriteLine($"beginning import of {data.Quests.Count} quests");
                 data.Quests.ForEach(q => q.AddToWz(wzFiles));
+            }
+            if (data.Npcs.Count > 0)
+            {
+                Console.WriteLine($"beginning import of {data.Npcs.Count} NPCs");
+                data.Npcs.ForEach(n => n.AddToWz(wzFiles));
             }
 
             Console.WriteLine($"saving wz files");
