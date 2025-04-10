@@ -26,6 +26,7 @@ namespace YamlToWz
         public List<YamlItem> Items { get; set; } = new();
         [YamlMember(Alias="npc", ApplyNamingConventions = false)]
         public List<YamlNpc> Npcs { get; set; } = new();
+        public List<YamlBulkOperation> BulkOperations { get; set; } = new();
 
         public static YamlData FromFile(string path)
         {
@@ -42,7 +43,8 @@ namespace YamlToWz
 
         public HashSet<string> GetWzFileNames()
         {
-            return (YamlQuest.WZ_FILES.Union(YamlPerk.WZ_FILES).Union(YamlItem.WZ_FILES).Union(YamlNpc.WZ_FILES)).ToHashSet();
+            return (YamlQuest.WZ_FILES.Union(YamlPerk.WZ_FILES).Union(YamlItem.WZ_FILES).Union(YamlNpc.WZ_FILES))
+                .ToHashSet();
         }
 
         public void SetPaths(string path)
@@ -59,6 +61,7 @@ namespace YamlToWz
             Perks.AddRange(other.Perks);
             Items.AddRange(other.Items);
             Npcs.AddRange(other.Npcs);
+            BulkOperations.AddRange(other.BulkOperations);
         }
     }
 
@@ -116,6 +119,7 @@ namespace YamlToWz
         private static void ImportToWzFiles(YamlData data, string wzPath)
         {
             var wzFileNames = data.GetWzFileNames();
+            wzFileNames.Add("Character.wz");
             var wzFM = new WzFileManager(wzPath, false, false);
             Dictionary<string, WzFile> wzFiles = new();
 
@@ -150,8 +154,15 @@ namespace YamlToWz
                 data.Npcs.ForEach(n => n.AddToWz(wzFiles));
             }
 
+            if (data.BulkOperations.Count > 0)
+            {
+                Console.WriteLine($"beginning {data.BulkOperations.Count} bulk operations");
+                data.BulkOperations.ForEach(b => b.Process(wzFiles));
+                SaveWzFile(wzFiles["Character.wz"], wzPath, "Character2.wz");
+            }
+
             Console.WriteLine($"saving wz files");
-            wzFiles.Keys.ToList().ForEach(fn => SaveWzFile(wzFiles[fn], wzPath, fn));
+            //wzFiles.Keys.ToList().ForEach(fn => SaveWzFile(wzFiles[fn], wzPath, fn));
         }
 
         private static void BackupWz(string path, string file)
