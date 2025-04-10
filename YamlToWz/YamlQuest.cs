@@ -23,6 +23,7 @@ namespace YamlToWz
         public string? StartScript { get; set; }
         public int EndNpc { get; set; }
         public string? EndScript { get; set; }
+        public bool AutoStart { get; set; } = false;
         public QuestBookInfo Info { get; set; }
         public QuestPrereqs Prereqs {get; set; }
         public QuestChecks Checks { get; set; }
@@ -48,6 +49,7 @@ namespace YamlToWz
             qiNode.AddAndUpdate(new WzStringProperty("0", Info.Available));
             qiNode.AddAndUpdate(new WzStringProperty("1", Info.InProgress));
             qiNode.AddAndUpdate(new WzStringProperty("2", Info.Completed));
+            if (AutoStart) qiNode.AddAndUpdate(new WzIntProperty("autoStart", 1));
 
             // Check.img
             var checkNode = new WzSubProperty(Id.ToString());
@@ -55,6 +57,7 @@ namespace YamlToWz
             var check_0 = new WzSubProperty("0");
             checkNode.AddAndUpdate(check_0);
             check_0.AddAndUpdate(new WzIntProperty("npc", StartNpc));
+            if (AutoStart) check_0.AddAndUpdate(new WzIntProperty("normalAutoStart", 1));
             if (Prereqs.MinLevel.HasValue)
                 check_0.AddAndUpdate(new WzIntProperty("lvmin", Prereqs.MinLevel.Value));
             if (Prereqs.MaxLevel.HasValue)
