@@ -56,7 +56,7 @@ namespace YamlToWz
 
                 // Character.wz
                 var infoNode = wzCharImg.GetFromPath("info") ?? new WzSubProperty("info");
-                if (Overrides.UpgradeSlots.HasValue) infoNode.AddAndUpdate(new WzIntProperty("upgradeSlots", Overrides.UpgradeSlots.Value));
+                if (Overrides.UpgradeSlots.HasValue) infoNode.AddAndUpdate(new WzIntProperty("tuc", Overrides.UpgradeSlots.Value));
                 if (Overrides.TradeBlocked) infoNode.AddAndUpdate(new WzIntProperty("tradeBlock", 1));
                 if (Overrides.Price.HasValue) infoNode.AddAndUpdate(new WzIntProperty("price", Overrides.Price.Value));
                 if (Overrides.ReqJob.HasValue) infoNode.AddAndUpdate(new WzIntProperty("reqJob", Overrides.ReqJob.Value));
@@ -86,7 +86,7 @@ namespace YamlToWz
                             infoNode.AddAndUpdate(new WzIntProperty($"inc{stat.Key.UppercaseFirst()}", stat.Value));
                             break;
 
-                        case "base":
+                        case "all_stat":
                             infoNode.AddAndUpdate(new WzIntProperty("incSTR", stat.Value));
                             infoNode.AddAndUpdate(new WzIntProperty("incDEX", stat.Value));
                             infoNode.AddAndUpdate(new WzIntProperty("incINT", stat.Value));

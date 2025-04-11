@@ -40,6 +40,8 @@ namespace YamlToWz
         public List<YamlNpc> Npcs { get; set; } = new();
         [YamlMember(Alias="map", ApplyNamingConventions = false)]
         public List<YamlMap> Maps { get; set; } = new();
+        [YamlMember(Alias="equip", ApplyNamingConventions = false)]
+        public List<YamlEquip> Equips { get; set; } = new();
         public List<YamlBulkOperation> BulkOperations { get; set; } = new();
 
         public static YamlData FromFile(string path)
@@ -57,7 +59,7 @@ namespace YamlToWz
 
         public HashSet<string> GetWzFileNames()
         {
-            return (YamlQuest.WZ_FILES.Union(YamlPerk.WZ_FILES).Union(YamlItem.WZ_FILES).Union(YamlNpc.WZ_FILES).Union(YamlMap.WZ_FILES))
+            return (YamlQuest.WZ_FILES.Union(YamlPerk.WZ_FILES).Union(YamlItem.WZ_FILES).Union(YamlNpc.WZ_FILES).Union(YamlMap.WZ_FILES).Union(YamlEquip.WZ_FILES))
                 .ToHashSet();
         }
 
@@ -68,6 +70,7 @@ namespace YamlToWz
             Items.ForEach(x => x.Path = path);
             Npcs.ForEach(x => x.Path = path);
             Maps.ForEach(x => x.Path = path);
+            Equips.ForEach(x => x.Path = path);
         }
 
         public void Merge(YamlData other)
@@ -77,6 +80,7 @@ namespace YamlToWz
             Items.AddRange(other.Items);
             Npcs.AddRange(other.Npcs);
             Maps.AddRange(other.Maps);
+            Equips.AddRange(other.Equips);
             BulkOperations.AddRange(other.BulkOperations);
         }
     }
@@ -182,6 +186,12 @@ namespace YamlToWz
             {
                 Console.WriteLine($"beginning import of {data.Maps.Count} maps");
                 data.Maps.ForEach(m => m.AddToWz(wzFiles));
+            }
+
+            if (data.Equips.Count > 0)
+            {
+                Console.WriteLine($"beginning import of {data.Equips.Count} equips");
+                data.Equips.ForEach(e => e.AddToWz(wzFiles));
             }
 
 
