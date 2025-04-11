@@ -26,6 +26,8 @@ namespace YamlToWz
         public List<YamlItem> Items { get; set; } = new();
         [YamlMember(Alias="npc", ApplyNamingConventions = false)]
         public List<YamlNpc> Npcs { get; set; } = new();
+        [YamlMember(Alias="map", ApplyNamingConventions = false)]
+        public List<YamlMap> Maps { get; set; } = new();
         public List<YamlBulkOperation> BulkOperations { get; set; } = new();
 
         public static YamlData FromFile(string path)
@@ -43,7 +45,7 @@ namespace YamlToWz
 
         public HashSet<string> GetWzFileNames()
         {
-            return (YamlQuest.WZ_FILES.Union(YamlPerk.WZ_FILES).Union(YamlItem.WZ_FILES).Union(YamlNpc.WZ_FILES))
+            return (YamlQuest.WZ_FILES.Union(YamlPerk.WZ_FILES).Union(YamlItem.WZ_FILES).Union(YamlNpc.WZ_FILES).Union(YamlMap.WZ_FILES))
                 .ToHashSet();
         }
 
@@ -53,6 +55,7 @@ namespace YamlToWz
             Perks.ForEach(x => x.Path = path);
             Items.ForEach(x => x.Path = path);
             Npcs.ForEach(x => x.Path = path);
+            Maps.ForEach(x => x.Path = path);
         }
 
         public void Merge(YamlData other)
@@ -61,6 +64,7 @@ namespace YamlToWz
             Perks.AddRange(other.Perks);
             Items.AddRange(other.Items);
             Npcs.AddRange(other.Npcs);
+            Maps.AddRange(other.Maps);
             BulkOperations.AddRange(other.BulkOperations);
         }
     }
@@ -119,7 +123,7 @@ namespace YamlToWz
         private static void ImportToWzFiles(YamlData data, string wzPath)
         {
             var wzFileNames = data.GetWzFileNames();
-            wzFileNames.Add("Character.wz");
+            wzFileNames.Add("Character.wz"); // bulk operations TODO
             var wzFM = new WzFileManager(wzPath, false, false);
             Dictionary<string, WzFile> wzFiles = new();
 
@@ -133,6 +137,13 @@ namespace YamlToWz
                 }
             }
 
+            wzFileNames = ["Map.wz", "String.wz"];
+
+            if (data.BulkOperations.Count > 0)
+            {
+                Console.WriteLine($"beginning {data.BulkOperations.Count} bulk operations");
+                data.BulkOperations.ForEach(b => b.Process(wzFiles));
+            }
             if (data.Items.Count > 0)
             {
                 Console.WriteLine($"beginning import of {data.Items.Count} items");
@@ -148,21 +159,22 @@ namespace YamlToWz
                 Console.WriteLine($"beginning import of {data.Quests.Count} quests");
                 data.Quests.ForEach(q => q.AddToWz(wzFiles));
             }
+
             if (data.Npcs.Count > 0)
             {
                 Console.WriteLine($"beginning import of {data.Npcs.Count} NPCs");
                 data.Npcs.ForEach(n => n.AddToWz(wzFiles));
             }
 
-            if (data.BulkOperations.Count > 0)
+            if (data.Maps.Count > 0)
             {
-                Console.WriteLine($"beginning {data.BulkOperations.Count} bulk operations");
-                data.BulkOperations.ForEach(b => b.Process(wzFiles));
-                SaveWzFile(wzFiles["Character.wz"], wzPath, "Character2.wz");
+                Console.WriteLine($"beginning import of {data.Maps.Count} maps");
+                data.Maps.ForEach(m => m.AddToWz(wzFiles));
             }
 
+
             Console.WriteLine($"saving wz files");
-            //wzFiles.Keys.ToList().ForEach(fn => SaveWzFile(wzFiles[fn], wzPath, fn));
+            wzFiles.Keys.ToList().ForEach(fn => SaveWzFile(wzFiles[fn], wzPath, fn));
         }
 
         private static void BackupWz(string path, string file)
