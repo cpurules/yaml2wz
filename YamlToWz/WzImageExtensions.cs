@@ -1,15 +1,35 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Reflection.Metadata;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using MapleLib.WzLib;
+using MapleLib.WzLib.WzProperties;
 
 namespace YamlToWz
 {
     public static class WzImageExtensions
     {
+        public static void DuplicateAs(this WzObject obj, string name)
+        {
+            WzObject parent = obj.Parent;
+            if (parent is WzDirectory wzDir && wzDir.GetImageByName(name) != null) parent.RemoveAndUpdate(name);
+            else if (parent is WzImage wzImg && wzImg.GetFromPath(name) != null) parent.RemoveAndUpdate(name);
+            else if (parent is IPropertyContainer && parent is WzImageProperty wzImgProp && wzImgProp.GetFromPath(name) != null) parent.RemoveAndUpdate(name);
+            
+            WzObject newObject;
+            if (obj is WzImage wzImage)
+                newObject = wzImage.DeepClone();
+            else if (obj is WzImageProperty wzImageProp)
+                newObject = wzImageProp.DeepClone();
+            else throw new Exception();
+
+            newObject.Name = name;
+            obj.Parent.AddAndUpdate(newObject);
+        }
 
         public static void RemoveAndUpdate(this WzObject parent, string propName)
         {
