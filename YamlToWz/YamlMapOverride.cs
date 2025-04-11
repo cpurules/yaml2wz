@@ -5,7 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using MapleLib.WzLib;
 using MapleLib.WzLib.WzProperties;
+using Microsoft.VisualBasic.CompilerServices;
 using static System.Runtime.InteropServices.JavaScript.JSType;
+using String = System.String;
 
 namespace YamlToWz
 {
@@ -15,6 +17,7 @@ namespace YamlToWz
         public string Path { get; set; }
         public int Id { get; set; }
         public int? CloneFrom { get; set; }
+        public List<YamlLife> AddLife { get; set; } = new();
 
         public YamlMapOverride? Overrides { get; set; }
 
@@ -89,6 +92,36 @@ namespace YamlToWz
                 }
 
                 if (addedOverride) wzMapImg.AddAndUpdate(mapInfo);
+            }
+
+            if (AddLife.Count > 0)
+            {
+                var wzMap = wzFiles["Map.wz"];
+                var wzMapImg = wzMap.WzDirectory.GetDirectoryByName("Map")
+                    .GetDirectoryByName("Map" + Id.ToString().Substring(0, 1)).GetImageByName(Id.ToString() + ".img");
+                if (wzMapImg == null) throw new ArgumentOutOfRangeException("no map found with id " + Id);
+
+                var lifeInfo = wzMapImg.GetFromPath("life") ?? new WzSubProperty("life");
+                var maxLife = lifeInfo.WzProperties.Select(x => x.Name).Where(x => int.TryParse(x, out int z) && z >= 0)
+                    .Select(x => int.Parse(x)).DefaultIfEmpty(-1).Max();
+
+                foreach (var addLife in AddLife)
+                {
+                    var lifeNode = new WzSubProperty((++maxLife).ToString());
+                    lifeInfo.AddAndUpdate(lifeNode);
+                    lifeNode.AddAndUpdate(new WzStringProperty("id", addLife.Id));
+                    lifeNode.AddAndUpdate(new WzStringProperty("type", addLife.Type.ToString()));
+                    lifeNode.AddAndUpdate(new WzIntProperty("x", addLife.X));
+                    lifeNode.AddAndUpdate(new WzIntProperty("y", addLife.Y));
+                    lifeNode.AddAndUpdate(new WzIntProperty("rx0", addLife.Rx0));
+                    lifeNode.AddAndUpdate(new WzIntProperty("rx1", addLife.Rx1));
+                    lifeNode.AddAndUpdate(new WzIntProperty("cy", addLife.Cy));
+                    lifeNode.AddAndUpdate(new WzIntProperty("f", addLife.F));
+                    lifeNode.AddAndUpdate(new WzIntProperty("fh", addLife.Fh));
+                    if (addLife.MobTime.HasValue) lifeNode.AddAndUpdate(new WzIntProperty("mobTime", addLife.MobTime.Value));
+                    if (addLife.Hide.HasValue) lifeNode.AddAndUpdate(new WzIntProperty("hide", addLife.Hide.Value));
+                }
+                wzMapImg.AddAndUpdate(lifeInfo);
             }
         }
     }
