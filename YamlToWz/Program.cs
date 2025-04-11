@@ -18,6 +18,18 @@ using WzSubProperty = MapleLib.WzLib.WzProperties.WzSubProperty;
 
 namespace YamlToWz
 {
+    public static class StringExtensions
+    {
+        public static string UppercaseFirst(this string value)
+        {
+            if (String.IsNullOrEmpty(value))
+                return "";
+
+            value = value.ToLower();
+            return Char.ToUpper(value[0]) + value.Substring(1);
+        }
+    }
+
     internal class YamlData
     {
         public List<YamlQuest> Quests { get; set; } = new();
